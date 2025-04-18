@@ -1,0 +1,29 @@
+\begin{thebibliography}{1}
+
+\bibitem{SolemsVisionBlog2015}
+solem's vision blog: {Histogram} equalization with {Python} and {NumPy}.
+\newblock
+  https://web.archive.org/web/20151219221513/http://www.janeriksolem.net/2009/06/histogram-equalization-with-python-and.html,
+  December 2015.
+
+\bibitem{gonzalezDigitalImageProcessing2017}
+Rafael~C. Gonzalez and Richard~E. Woods.
+\newblock {\em Digital image processing}.
+\newblock Pearson, New York, fourth edition, global edition edition, 2017.
+
+\bibitem{karnewarBacktobasicsPart12018}
+Animesh Karnewar.
+\newblock Back-to-basics {Part} 1: {Histogram} {Equalization} in {Image}
+  {Processing}.
+\newblock
+  https://medium.com/@animeshsk3/back-to-basics-part-1-histogram-equalization-in-image-processing-f607f33c5d55,
+  October 2018.
+
+\bibitem{walkerHistogramEqualizationPython2023}
+Tory Walker.
+\newblock Histogram {Equalization} in {Python} from {Scratch}.
+\newblock
+  https://medium.com/hackernoon/histogram-equalization-in-python-from-scratch-ebb9c8aa3f23,
+  April 2023.
+
+\end{thebibliography}
