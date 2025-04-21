@@ -15,6 +15,10 @@ function new_img = affineTransform(img, tx, ty, scale, theta)
         scale (1,1) {mustBeNumeric, mustBePositive}
         theta (1,1) {mustBeNumeric, mustBeFinite}
     end
+
+    if ndims(img) ~= 2
+        error('Input image must be a grayscale (2D) image.');
+    end
     
     % Reading image size
     [height, width] = size(img);
@@ -83,3 +87,4 @@ function new_img = affineTransform(img, tx, ty, scale, theta)
     % Giving the right format to output image
     new_img = uint8(new_img);
 end
+
