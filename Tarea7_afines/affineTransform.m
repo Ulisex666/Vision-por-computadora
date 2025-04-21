@@ -6,15 +6,20 @@ function new_img = affineTransform(img, tx, ty, scale, theta)
 % NEWIMG = AFFINETRANSFORMS(img, tx, ty, scale, theta) applies x 
 % translation, y translation, scaling and rotation with given parameters
 % in that specific order.
+
+    % Type checking
+    arguments
+        img (:,:) {mustBeNumeric, mustBeNonempty}
+        tx (1,1) {mustBeNumeric, mustBeFinite}
+        ty (1,1) {mustBeNumeric, mustBeFinite}
+        scale (1,1) {mustBeNumeric, mustBePositive}
+        theta (1,1) {mustBeNumeric, mustBeFinite}
+    end
     
     % Reading image size
     [height, width] = size(img);
     % Generating new image with same size
     new_img = zeros(size(img));
-    if scale == 0
-        new_img = uint8(new_img); 
-        return 
-    end
     % Matrix for translation on x and y axis
     translation_matrix = [1, 0, tx; 0, 1, ty; 0, 0, 1];
     % Matrix for scaling in the same factor over the x and y axis
