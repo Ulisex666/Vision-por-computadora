@@ -3,7 +3,7 @@ import cv2
 import matplotlib.pyplot as plt
 
 # Reading the files and asserting a correct path
-img = cv2.imread('/media/ulisex/3AEEAC75EEAC2B59/Users/Ulises/Documents/laptop/Nova 3/File_Restore/Screenshot_20201201_191429_com.instagram.android.jpg', 0)
+img = cv2.imread('PATH', 0)
 assert img is not None, "file could not be read, check path"
 
 # Getting the dimensions of the image and creating a flat
