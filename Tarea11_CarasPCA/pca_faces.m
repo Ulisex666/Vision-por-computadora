@@ -65,7 +65,7 @@ for i=1:4
 
 end
 
-% Generando una cara dados parámetros aleatorios
+% Generando la primera cara
 new_alpha = alphas(1,:);  
 new_face = new_alpha * pcV' + mu;
 
