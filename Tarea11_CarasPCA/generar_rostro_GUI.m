@@ -1,118 +1,130 @@
 function generar_rostro_GUI
-% Cargar datos a utilizar para generar los puntos del rostro: media y
-% matriz de componentes principales. Se utilizan los parámetros de ajuste 
-% obtenidos para limitar la interfaz a valores a 3 desviaciones estándar de
-% la media 0
-load("faces_eigenvecs.mat", "pcV")
-load("faces_mean.mat", "mu")
-load("alphas_caras.mat", "alphas")
+    % Cargar datos
+    load("faces_eigenvecs.mat", "pcV")
+    load("faces_mean.mat", "mu")
+    load("alphas_caras.mat", "alphas")
 
-% Crear figura sobre la que se graficará el rostro
-f = figure('Name', 'Generar rostros con modelo estadístico de forma', ...
-    'Position',[100 100 600 600], 'NumberTitle','off');
-
-% Se muestra el primer rostro como base de la interfaz
-ax = axes('Parent', f, 'Position',[0.1 0.4 0.8 0.55]);
-cara1 = imread("BioID_0001.pgm");
+    % Crear figura sobre la que se graficará el rostroa
+    f = figure('Name', 'Generar rostros con modelo estadístico de forma', ...
+        'Units', 'normalized', 'OuterPosition', [0 0 1 1], ...
+        'NumberTitle','off');
 
 
-% Iniciar los parámetros ajustados a la cara de fondo
-alpha = [67.96569,	-8.3865,	33.8527,	-3.3955];
+    % Se muestra el primer rostro como base de la interfaz
+    ax = axes('Parent', f, 'Position',[0.05 0.1 0.35 0.8]);
+    cara1 = imread("BioID_0001.pgm");
 
-% Generar rostro mediante PCA
-new_face = alpha*pcV' + mu;
-graph_face(new_face)
+    % Iniciar los parámetros ajustados a la cara de fondo
+    alpha = [-7.7409,-3.4482,3.420,-3.3884,3.2423,-0.5002,3.7840, ...
+             2.8480,-0.2839,0.2117,-0.285,2.4314];
 
-% Los límites de cada parámetro están dados por los máximos y mínimos
-% encontrados en el PCA de las 100 imágenes
-mins = min(alphas, [], 1);
-maxs = max(alphas, [], 1);
-% Crear botones deslizables para ajustar parámetros alpha
-slider_pos_y = linspace(0.3, 0.05, 4);
+    % Los límites de cada parámetro están dados por los máximos y mínimos
+    % encontrados en el PCA de las 100 imágenes
+    mins = min(alphas, [], 1);
+    maxs = max(alphas, [], 1);
 
-% Barras deslizantes
-sliders = gobjects(1,4);
+    % Generar rostro mediante PCA
+    new_face = alpha * pcV' + mu;
+    graph_face(new_face);
 
-% Texto
-labels = gobjects(1,4);
+    % Número de parámetros
+    N = numel(alpha);
 
-% Cajas de texto editables. Muestran el valor actual del parámetro
-edit_boxes = gobjects(1,4);
-for j=1:4
-    min_val = mins(j);
-    max_val = maxs(j);
+    % Espaciado horizontal entre controles
+    spacing = 0.04;
+    base_x = 0.45;
 
-    % Texto que indica el parámetro que se ajusta
-    labels(j) = uicontrol('Style','text', ...
-    'Position',[50 100 * slider_pos_y(j) * 6 150 20], ...
-    'String', sprintf('Alfa %d [%.1f, %.1f]', j, min_val, max_val), ...
-    'FontSize', 10);
+    % Crear botones deslizables para ajustar parámetros alpha
+    sliders = gobjects(1,N);
+    % Cajas de texto para ajustar parámetros alfa
+    edit_boxes = gobjects(1,N);
 
-    % Barras deslizantes para manipular el valor del parámetro
-    sliders(j) = uicontrol('Style','slider', ...
-    'Min', min_val, 'Max', max_val, ...
-    'Value', alpha(j), ...
-    'Position',[200 100 * slider_pos_y(j) * 6 300 20], ...
-    'Callback', @(src, ~) sliderCallback(j));
+    for i = 1:N
+        x_pos = base_x + (i-1) * spacing;
 
-    % Cajas de texto editable para mostrar el valor actual del parámetro o 
-    % para ajustarlo de forma exacta
-    edit_boxes(j) = uicontrol('Style', 'edit', ...
-    'String', num2str(alpha(j), '%.2f'), ...
-    'Position', [510 100 * slider_pos_y(j) * 6 60 20], ...
-    'Callback', @(src, ~) editCallback(j));
-end
+        % Texto con número de parámetro alpha
+        uicontrol(f, 'Style', 'text', ...
+            'Units', 'normalized', ...
+            'Position', [x_pos 0.92 0.035 0.04], ...
+            'String', sprintf('Alfa %d', i), ...
+            'FontSize', 9);
 
-% Actualización de la cara cuando se ajustan los parámetros en la interfaz
+        % Barras deslizantes para manipular el valor del parámetro 
+        sliders(i) = uicontrol(f, 'Style', 'slider', ...
+            'Units', 'normalized', ...
+            'Min', mins(i), 'Max', maxs(i), ...
+            'Value', alpha(i), ...
+            'SliderStep', [0.01 0.1], ...
+            'Position', [x_pos+0.005 0.32 0.015 0.55], ...
+            'Callback', @(src,~) sliderCallback(i));
+
+        % Cajas de texto editable para mostrar el valor actual del parámetro o 
+        % para ajustarlo de forma exacta
+        edit_boxes(i) = uicontrol(f, 'Style', 'edit', ...
+            'Units', 'normalized', ...
+            'Position', [x_pos 0.24 0.035 0.04], ...
+            'String', num2str(alpha(i), '%.2f'), ...
+            'Callback', @(src,~) editCallback(i));
+
+        % Texto con rango mínimo y máximo
+        uicontrol(f, 'Style', 'text', ...
+            'Units', 'normalized', ...
+            'Position', [x_pos 0.18 0.04 0.04], ...
+            'String', sprintf('[%.1f, %.1f]', mins(i), maxs(i)), ...
+            'FontSize', 8);
+    end
+
+    % Actualización de la cara cuando se ajustan los parámetros en
+    % la interfaz
 
     % Actualización cuando se mueve una barra deslizante
-    function sliderCallback(idx)
-        alpha(idx) = sliders(idx).Value; % Re-evaluar parámetro alfa
-        edit_boxes(idx).String = sprintf('%.2f', alpha(idx)); % Ajustar cajas de texto
-        new_face = alpha * pcV' + mu; % Encontrar nueo rostro
-        graph_face(new_face) % Graficar nuevo rostro
+    function sliderCallback(i)
+        alpha(i) = sliders(i).Value; % Re-evaluar parámetro alfa
+        edit_boxes(i).String = sprintf('%.2f', alpha(i)); % Ajustar cajas de texto
+        actualizar_rostro(); % Encontrar nuevo rostro
     end
 
     % Actualización cuando se alteran las cajas de texto
-    function editCallback(index)
-    val = str2double(edit_boxes(index).String); % obtener valor numérico del texto
-    if isnan(val) % Error si no es un número
-        return;
+    function editCallback(i)
+        val = str2double(edit_boxes(i).String);  % obtener valor numérico del texto
+        if isnan(val), return; end  % Error si no es un número
+        val = max(mins(i), min(maxs(i), val));  % Limitar al rango adecuado
+        alpha(i) = val;  % Actualizar alfa
+        sliders(i).Value = val; % Actualizar barra deslizante
+        edit_boxes(i).String = sprintf('%.2f', val); % Actualizar caja de texto
+        actualizar_rostro(); % Graficar nueva cara
     end
-    val = max(sliders(index).Min, min(sliders(index).Max, val)); % Limitar al rango adecuado
-    alpha(index) = val; % Actualizar alfa
-    sliders(index).Value = val;  % Actualizar barra deslizante
-    edit_boxes(index).String = sprintf('%.2f', val);  % Actualizar caja de texto
-    new_face = alpha * pcV' + mu;
-    graph_face(new_face); % Graficar nueva cara
+
+    % Actualizar rostro generado
+    function actualizar_rostro()
+        new_face = alpha * pcV' + mu;
+        graph_face(new_face);
     end
 
     % Función para graficar la cara dada lista de coordenadas (1x40)
     function graph_face(point_list)
         cla(ax); % Limpiar imagen
-        imshow(cara1, 'Parent',ax) % Volver a graficar rostro
-        hold(ax, "on")
+        imshow(cara1, 'Parent', ax); % Volver a graficar rostro
+        hold(ax, "on");
 
         points = reshape(point_list, 2, [])'; % Darle forma de matriz a los 
                                               % puntos (20, 2)
-        
+
         % Struct donde se indica a que parte del cuerpo pertenece cada
         % índice
         partes = {
-        [3, 18, 4, 19, 3], 'Labios';
-        [10, 1, 11, 10], 'Ojo Izquierdo';
-        [12, 2, 13, 12], 'Ojo Derecho';
-        [16, 15, 17, 16], 'Nariz';
-        [20, 14, 8, 7, 6, 5, 9, 20], 'Contorno'
+            [3, 18, 4, 19, 3], 'Labios';
+            [10, 1, 11, 10], 'Ojo Izquierdo';
+            [12, 2, 13, 12], 'Ojo Derecho';
+            [16, 15, 17, 16], 'Nariz';
+            [20, 14, 8, 7, 6, 5, 9, 20], 'Contorno'
         };
         
-        % Se grafica cada parte del cuerpo, uniendo los puntos
-        for i = 1:size(partes,1)
-            idx = partes{i,1};
-            plot(ax, points(idx,1), points(idx,2), 'r.-', 'DisplayName', partes{i,2});
+        % Se grafica cada parte del cuerpo, uniendo los puntos 
+        for k = 1:size(partes,1)
+            idx = partes{k,1};
+            plot(ax, points(idx,1), points(idx,2), 'r.-', 'DisplayName', partes{k,2});
         end
-
-        hold(ax, 'off')
+        hold(ax, "off");
     end
-
 end
