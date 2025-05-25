@@ -22,12 +22,12 @@ end
 % originales
 k = 4;
 alphas = score(:, 1:k);         % Proyecciones de los datos, 4 parámetros 
-pcV = coeff(:, 1:k);         % Eigenvectores 
+pcV = coeff(:, 1:k);         % Eigenvectores de los 4 primeros componentes 
 pcD = latent(1:k) / sum(latent);  % Porcentaje de varianza explicada
 
 
 % Reconstrucción de los datos
-modelos = alphas*pcV' + mu; 
+modelos = alphas*pcV' + mu ; 
 
 % Varianza acumulada explicada por componente
 varianza_acumulada = cumsum(explained); 
@@ -41,26 +41,28 @@ title('Varianza explicada acumulada por PCA')
 grid on
 
 % Histograma de los 4 parámetros 
+stds = std(alphas);
+medias = mean(alphas);
+
 figure
-subplot(2,2,1)
-histogram(alphas(:,1))
-title('Parámetro \alpha_1')
-% Min = -0.049, Max = 0.27
+for i=1:4
+    subplot(2,2,i)
+    histogram(alphas(:,i))
+    titulo = ['Parámetro \alpha_' , num2str(i)];
+    title(titulo)
+    hold on
+    xline(medias(i),'r', 'LineWidth', 2, 'Label', 'Media', ...
+        'LabelVerticalAlignment', 'bottom')
+    xline(medias(i) + stds(i), '--k', 'LineWidth', 1.5, 'Label', '+1\sigma')
+    xline(medias(i) - stds(i), '--k', 'LineWidth', 1.5, 'Label', '-1\sigma')
+    xline(medias(i) + 2*stds(i), '--k', 'LineWidth', 1.5, 'Label', '+2\sigma')
+    xline(medias(i) - 2*stds(i), '--k', 'LineWidth', 1.5, 'Label', '-2\sigma')
+    y_limits = ylim;
+    text(stds(i), y_limits(2)/2, ['\sigma = ', num2str(stds(i), '%.2f')])
 
-subplot(2,2,2)
-histogram(alphas(:,2))
-title('Parámetro \alpha_2')
-% Min = 0.004, Max = 0.23
+    hold off
 
-subplot(2,2,3)
-histogram(alphas(:,3))
-title('Parámetro \alpha_3')
-% Min = -0.25, Max = 0.36
-
-subplot(2,2,4)
-histogram(alphas(:,4))
-title('Parámetro \alpha_4')
-% Min = -0.32, Max = 0.48
+end
 
 % Generando una cara dados parámetros aleatorios
 new_alpha = alphas(1,:);  
@@ -99,3 +101,4 @@ plot(points(idx_nariz, 1), points(idx_nariz, 2), 'r.-')
 % Graficando contorno de la cara
 plot(points(idx_contorno, 1), points(idx_contorno, 2), 'r.-')
 hold off
+
