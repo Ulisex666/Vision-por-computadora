@@ -8,8 +8,8 @@ cara1 = imread("BioID_0001.pgm");
 % Reorganizar los puntos (x,y) en una sola fila por cara: (100 × 40)
 datos_fila = [];
 for i = 1:100
-    x = squeeze(best_faces(i,1,:))';  % Vector fila de x
-    y = squeeze(best_faces(i,2,:))';  % Vector fila de y
+    x = best_faces{i}(:,1)';  % Vector fila de x
+    y = best_faces{i}(:,2)';  % Vector fila de y
     cara = reshape([x; y], 1, []);    % Alternar x1 y1 x2 y2 ...
     datos_fila = cat(1, datos_fila, cara);
 end
@@ -18,11 +18,11 @@ end
 % Cada fila es una cara, cada columna una coordenada 
 [coeff, score, latent, ~, explained, mu] = pca(datos_fila);
 
-% Se toman 4 componentes, que explican el 99% de la varianza en los datos
-% originales
-k = 4;
-alphas = score(:, 1:k);         % Proyecciones de los datos, 4 parámetros 
-pcV = coeff(:, 1:k);         % Eigenvectores de los 4 primeros componentes 
+% Se toman 12 componentes, explicando un poco más del 90% de la
+% variabilidad
+k = 12;
+alphas = score(:, 1:k);         % Proyecciones de los datos, 12 parámetros 
+pcV = coeff(:, 1:k);         % Eigenvectores de los 12 primeros componentes 
 pcD = latent(1:k) / sum(latent);  % Porcentaje de varianza explicada
 
 
@@ -40,15 +40,15 @@ ylabel('Varianza explicada acumulada (%)')
 title('Varianza explicada acumulada por PCA')
 grid on
 
-% Histograma de los 4 parámetros 
+% Histograma de los 12 parámetros 
 stds = std(alphas);
 medias = mean(alphas);
 
 figure
-for i=1:4
-    subplot(2,2,i)
+for i=1:k
+    subplot(6,2,i)
     histogram(alphas(:,i))
-    titulo = ['Parámetro \alpha_' , num2str(i)];
+    titulo = ['Parámetro \alpha_{' , num2str(i), '}'];
     title(titulo)
     hold on
     % Se muestra la media y dos desviaciones estándar
@@ -65,7 +65,7 @@ for i=1:4
 
 end
 
-% Generando la primera cara
+% Generando una cara dados parámetros aleatorios
 new_alpha = alphas(1,:);  
 new_face = new_alpha * pcV' + mu;
 
