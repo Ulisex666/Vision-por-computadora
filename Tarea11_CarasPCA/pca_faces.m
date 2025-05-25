@@ -51,6 +51,7 @@ for i=1:4
     titulo = ['Parámetro \alpha_' , num2str(i)];
     title(titulo)
     hold on
+    % Se muestra la media y dos desviaciones estándar
     xline(medias(i),'r', 'LineWidth', 2, 'Label', 'Media', ...
         'LabelVerticalAlignment', 'bottom')
     xline(medias(i) + stds(i), '--k', 'LineWidth', 1.5, 'Label', '+1\sigma')
@@ -101,4 +102,3 @@ plot(points(idx_nariz, 1), points(idx_nariz, 2), 'r.-')
 % Graficando contorno de la cara
 plot(points(idx_contorno, 1), points(idx_contorno, 2), 'r.-')
 hold off
-
